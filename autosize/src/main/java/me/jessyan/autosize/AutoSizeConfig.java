@@ -24,6 +24,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.WindowManager;
 
 import java.lang.reflect.Field;
 
@@ -33,6 +35,7 @@ import me.jessyan.autosize.unit.UnitsManager;
 import me.jessyan.autosize.utils.AutoSizeLog;
 import me.jessyan.autosize.utils.Preconditions;
 import me.jessyan.autosize.utils.ScreenUtils;
+import me.jessyan.autosize.utils.SystemProperties;
 
 /**
  * ================================================
@@ -160,6 +163,12 @@ public final class AutoSizeConfig {
      */
     private onAdaptListener mOnAdaptListener;
 
+    /**
+     * 是否屏蔽“设置-显示-显示大小”对 AndroidAutoSize 的影响,如果为 {@code true}, App 内的尺寸的大小将不会跟随系统设置中字显示大小的改变
+     *      * 如果为 {@code false}, 则会跟随系统设置中显示大小的改变, 默认为 {@code false}
+     */
+    private boolean isExcludeDisplayScale = false;
+
     static {
         DEPENDENCY_ANDROIDX = findClassByClassName("androidx.fragment.app.FragmentActivity");
         DEPENDENCY_SUPPORT = findClassByClassName("android.support.v4.app.FragmentActivity");
@@ -252,7 +261,12 @@ public final class AutoSizeConfig {
 
         mInitDensity = displayMetrics.density;
         mInitDensityDpi = displayMetrics.densityDpi;
-        mInitScaledDensity = displayMetrics.scaledDensity;
+        if (isExcludeDisplayScale) {
+            mInitScaledDensity = 1.0f * getDeviceDensity() / DisplayMetrics.DENSITY_DEFAULT;
+        } else {
+            mInitScaledDensity = displayMetrics.scaledDensity;
+        }
+        AutoSizeLog.d("init: mInitScaledDensity = " + mInitScaledDensity);
         mInitXdpi = displayMetrics.xdpi;
         mInitScreenWidthDp = configuration.screenWidthDp;
         mInitScreenHeightDp = configuration.screenHeightDp;
@@ -260,11 +274,12 @@ public final class AutoSizeConfig {
             @Override
             public void onConfigurationChanged(Configuration newConfig) {
                 if (newConfig != null) {
-                    if (newConfig.fontScale > 0) {
-                        mInitScaledDensity =
-                                Resources.getSystem().getDisplayMetrics().scaledDensity;
-                        AutoSizeLog.d("initScaledDensity = " + mInitScaledDensity + " on ConfigurationChanged");
+                    if (!isExcludeDisplayScale) {
+                        if (newConfig.fontScale > 0) {
+                            mInitScaledDensity = Resources.getSystem().getDisplayMetrics().scaledDensity;
+                        }
                     }
+                    AutoSizeLog.d("initScaledDensity = " + mInitScaledDensity + " on ConfigurationChanged");
                     isVertical = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT;
                     int[] screenSize = ScreenUtils.getScreenSize(application);
                     mScreenWidth = screenSize[0];
@@ -600,6 +615,27 @@ public final class AutoSizeConfig {
     }
 
     /**
+     * 是否屏蔽“设置-显示-显示大小”对 AndroidAutoSize 的影响, 如果为 {@code true}, App 内的尺寸的大小将不会跟随系统设置中显示大小的改变
+     * 如果为 {@code false}, 则会跟随系统设置中显示大小的改变, 默认为 {@code false}
+     *
+     * @return {@link #isExcludeDisplayScale}
+     */
+    public boolean isExcludeDisplayScale() {
+        return isExcludeDisplayScale;
+    }
+
+    /**
+     * 是否屏蔽“设置-显示-显示大小”对 AndroidAutoSize 的影响, 如果为 {@code true}, App 内的尺寸的大小将不会跟随系统设置中显示大小的改变
+     * 如果为 {@code false}, 则会跟随系统设置中显示大小的改变, 默认为 {@code false}
+     *
+     * @param excludeDisplayScale 是否屏蔽
+     */
+    public AutoSizeConfig setExcludeDisplayScale(boolean excludeDisplayScale) {
+        isExcludeDisplayScale = excludeDisplayScale;
+        return this;
+    }
+
+    /**
      * 区别于系统字体大小的放大比例, AndroidAutoSize 允许 APP 内部可以独立于系统字体大小之外，独自拥有全局调节 APP 字体大小的能力
      * 当然, 在 APP 内您必须使用 sp 来作为字体的单位, 否则此功能无效
      *
@@ -710,5 +746,14 @@ public final class AutoSizeConfig {
                 }
             }
         }).start();
+    }
+
+    private static int getDeviceDensity() {
+        // qemu.sf.lcd_density can be used to override ro.sf.lcd_density
+        // when running in the emulator, allowing for dynamic configurations.
+        // The reason for this is that ro.sf.lcd_density is write-once and is
+        // set by the init process when it parses build.prop before anything else.
+        return SystemProperties.getInt("qemu.sf.lcd_density",
+                SystemProperties.getInt("ro.sf.lcd_density", DisplayMetrics.DENSITY_DEFAULT));
     }
 }
