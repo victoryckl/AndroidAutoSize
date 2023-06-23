@@ -22,7 +22,8 @@ android {
 
 dependencies {
 //    implementation 'me.jessyan:autosize:1.2.1'
-    implementation project(':autosize')
+    implementation 'io.github.victoryckl:autosize:1.3.0'
+//    implementation project(':autosize')
     implementation rootProject.androidx_appcompat
     testImplementation 'junit:junit:4.12'
 }

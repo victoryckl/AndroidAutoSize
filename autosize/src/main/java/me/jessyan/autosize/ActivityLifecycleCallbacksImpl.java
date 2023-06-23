@@ -40,15 +40,16 @@ public class ActivityLifecycleCallbacksImpl implements Application.ActivityLifec
     /**
      * 让 Fragment 支持自定义适配参数
      */
-    private FragmentLifecycleCallbacksImpl mFragmentLifecycleCallbacks;
+//    private FragmentLifecycleCallbacksImpl mFragmentLifecycleCallbacks;
     private FragmentLifecycleCallbacksImplToAndroidx mFragmentLifecycleCallbacksToAndroidx;
 
     public ActivityLifecycleCallbacksImpl(AutoAdaptStrategy autoAdaptStrategy) {
         if (DEPENDENCY_ANDROIDX) {
             mFragmentLifecycleCallbacksToAndroidx = new FragmentLifecycleCallbacksImplToAndroidx(autoAdaptStrategy);
-        } else if (DEPENDENCY_SUPPORT){
-            mFragmentLifecycleCallbacks = new FragmentLifecycleCallbacksImpl(autoAdaptStrategy);
         }
+//        else if (DEPENDENCY_SUPPORT){
+//            mFragmentLifecycleCallbacks = new FragmentLifecycleCallbacksImpl(autoAdaptStrategy);
+//        }
         mAutoAdaptStrategy = autoAdaptStrategy;
     }
 
@@ -57,9 +58,10 @@ public class ActivityLifecycleCallbacksImpl implements Application.ActivityLifec
         if (AutoSizeConfig.getInstance().isCustomFragment()) {
             if (mFragmentLifecycleCallbacksToAndroidx != null && activity instanceof androidx.fragment.app.FragmentActivity) {
                 ((androidx.fragment.app.FragmentActivity) activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(mFragmentLifecycleCallbacksToAndroidx, true);
-            } else if (mFragmentLifecycleCallbacks != null && activity instanceof android.support.v4.app.FragmentActivity) {
-                ((android.support.v4.app.FragmentActivity) activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(mFragmentLifecycleCallbacks, true);
             }
+//            else if (mFragmentLifecycleCallbacks != null && activity instanceof android.support.v4.app.FragmentActivity) {
+//                ((android.support.v4.app.FragmentActivity) activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(mFragmentLifecycleCallbacks, true);
+//            }
         }
 
         //Activity 中的 setContentView(View) 一定要在 super.onCreate(Bundle); 之后执行
@@ -109,8 +111,9 @@ public class ActivityLifecycleCallbacksImpl implements Application.ActivityLifec
         mAutoAdaptStrategy = autoAdaptStrategy;
         if (mFragmentLifecycleCallbacksToAndroidx != null) {
             mFragmentLifecycleCallbacksToAndroidx.setAutoAdaptStrategy(autoAdaptStrategy);
-        } else if (mFragmentLifecycleCallbacks != null) {
-            mFragmentLifecycleCallbacks.setAutoAdaptStrategy(autoAdaptStrategy);
         }
+//        else if (mFragmentLifecycleCallbacks != null) {
+//            mFragmentLifecycleCallbacks.setAutoAdaptStrategy(autoAdaptStrategy);
+//        }
     }
 }

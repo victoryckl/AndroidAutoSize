@@ -16,8 +16,8 @@
 package me.jessyan.autosize;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+//import android.support.v4.app.Fragment;
+//import android.support.v4.app.FragmentManager;
 
 /**
  * ================================================
@@ -29,29 +29,29 @@ import android.support.v4.app.FragmentManager;
  * <a href="https://github.com/JessYanCoding">Follow me</a>
  * ================================================
  */
-public class FragmentLifecycleCallbacksImpl extends FragmentManager.FragmentLifecycleCallbacks {
-    /**
-     * 屏幕适配逻辑策略类
-     */
-    private AutoAdaptStrategy mAutoAdaptStrategy;
-
-    public FragmentLifecycleCallbacksImpl(AutoAdaptStrategy autoAdaptStrategy) {
-        mAutoAdaptStrategy = autoAdaptStrategy;
-    }
-
-    @Override
-    public void onFragmentCreated(FragmentManager fm, Fragment f, Bundle savedInstanceState) {
-        if (mAutoAdaptStrategy != null) {
-            mAutoAdaptStrategy.applyAdapt(f, f.getActivity());
-        }
-    }
-
-    /**
-     * 设置屏幕适配逻辑策略类
-     *
-     * @param autoAdaptStrategy {@link AutoAdaptStrategy}
-     */
-    public void setAutoAdaptStrategy(AutoAdaptStrategy autoAdaptStrategy) {
-        mAutoAdaptStrategy = autoAdaptStrategy;
-    }
-}
+//public class FragmentLifecycleCallbacksImpl extends FragmentManager.FragmentLifecycleCallbacks {
+//    /**
+//     * 屏幕适配逻辑策略类
+//     */
+//    private AutoAdaptStrategy mAutoAdaptStrategy;
+//
+//    public FragmentLifecycleCallbacksImpl(AutoAdaptStrategy autoAdaptStrategy) {
+//        mAutoAdaptStrategy = autoAdaptStrategy;
+//    }
+//
+//    @Override
+//    public void onFragmentCreated(FragmentManager fm, Fragment f, Bundle savedInstanceState) {
+//        if (mAutoAdaptStrategy != null) {
+//            mAutoAdaptStrategy.applyAdapt(f, f.getActivity());
+//        }
+//    }
+//
+//    /**
+//     * 设置屏幕适配逻辑策略类
+//     *
+//     * @param autoAdaptStrategy {@link AutoAdaptStrategy}
+//     */
+//    public void setAutoAdaptStrategy(AutoAdaptStrategy autoAdaptStrategy) {
+//        mAutoAdaptStrategy = autoAdaptStrategy;
+//    }
+//}
